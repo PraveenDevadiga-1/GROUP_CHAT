@@ -1,0 +1,11 @@
+{% extends "groups/group_base.html" %}
+{% block group_content %}
+<div class="container">
+<form  method="post">
+  {%csrf_token%}
+  <p>Are your sure you want to delete <h1>{{object}} ?</h1></p><br>
+  <input type="submit" class='btn btn-danger' value="Delete">
+  <a href="{% url 'groups:single' slug=group.slug %}" class='btn btn-simple btn-large btn-default'>cancel</a>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "groups/group_base.html" %}
+{% load bootstrap3 %}
+{% block group_content  %}
+<div class="container">
+  <div class="row">
+   <div class="col-md-4 info2"><hr>
+     <h1><strong>{{group.name}}</strong></h1>
+     <h4>  {{group.description_html|safe}}</h4><hr>
+     <h4>Admin:{{group.admin}}</h4>
+     <h4>Member Count :{{group.members.count}}</h4>
+     {% if user in group.members.all%}
+     <a href="{% url 'groups:leave' slug=group.slug %}"
+     class="btn btn-warning btn-primary btn-lg"><span
+     class="glyphicon glyphicon-remove-circle"></span>Leave</a>
+     {%else%}
+     <a href="{% url 'groups:join' slug=group.slug %}"
+     class="btn btn-warning btn-primary btn-lg"><span
+     class="glyphicon glyphicon-ok-circle"></span>Join</a>
+     {%endif%}
+     {% ifequal group.admin|stringformat:"s" request.user.username %}
+     <a href="{% url 'groups:delete' slug=group.slug %}"
+      class="btn btn-lg btn-fill btn-warning"><span
+      class="glyphicon glyphicon-remove-circle"></span>Delete</a>
+     {% endifequal %}
+     <hr>
+     <h3>Members List</h3>
+     {% for member in group.members.all %}
+     <span class='username'>
+       <a href="{% url 'posts:for_user' username=member.username %}">@{{member.username}}</a><br>
+     </span>
+     {%endfor%}
+</div>
+<div class=" col-md-8">
+  {% if user in group.members.all%}
+  <div class="ScrollStyle">
+  {% if group.posts.count == 0 %}
+  <h2>No messages in this group yet!</h2>
+  {%else%}
+  {%for post in group.posts.all %}
+  <div class="row">
+    {% ifequal post.user.username|stringformat:"s" request.user.username %}
+    <div class="col-md-6 ml-auto info4">
+    {% include "posts/_post.html"%}
+    </div>
+    {%else%}
+    <div class="col-md-6 info3">
+    {% include "posts/_post.html"%}
+    </div>
+    {% endifequal %}
+  </div>
+  <br>
+  {%endfor%}
+  {%endif%}
+  </div>
+  <br>
+  <div class="row">
+  <div class="col-md-8 ml-md-auto info6">
+    <form id='postForm' action="{%url 'groups:single' slug=group.slug %}" method="post">
+      {% csrf_token %}
+      {% bootstrap_form post_form %}
+      <input type="submit" class="btn btn-primary btn-large" value="S E N D" onclick="refresh()"/>
+    </form>
+  </div>
+  </div>
+  {%else%}
+  <br>
+  <h1>Join the group to explore more!</h1>
+  {%endif%}
+  </div>
+</div>
+</div>
+{%endblock%}
